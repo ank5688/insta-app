@@ -105,7 +105,7 @@ export class InstaPhotos extends DDDSuper(I18NMixin(LitElement)) {
 <div class="slide-content">
   ${this.topHeading ? html`<h2>${this.topHeading}</h2>` : ""}
   ${this.secondHeading ? html`<h3>${this.secondHeading}</h3>` : ""}
-  <div class="line">⎯⎯</div>
+  <div class="line"></div>
   <div class="body">
     <slot></slot>
   </div>

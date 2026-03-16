@@ -90,18 +90,18 @@ export class InstaApp extends DDDSuper(I18NMixin(LitElement)) {
   <h3><span>${this.t.title}</span> ${this.title}</h3>
   <slot></slot>
   <div class="arrow">
-    <slide-arrow
+    <insta-arrows
       .index=${this.currentIndex}
       .total=${this.slides ? this.slides.length : 0}
       @prev-clicked=${this.prev}
       @next-clicked=${this.next}>
-    </slide-arrow>
+    </insta-arrows>
   </div>
-  <slide-indicator
+  <insta-indicators
     @playlist-index-changed=${this.handleEvent}
     .total=${this.slides ? this.slides.length : 0}
     .currentIndex=${this.currentIndex}>
-  </slide-indicator>
+  </insta-indicators>
   </div>`;
   }
 
