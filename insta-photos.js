@@ -27,6 +27,9 @@ export class InstaPhotos extends DDDSuper(I18NMixin(LitElement)) {
     this.active = false;
     this.topHeading = "";
     this.secondHeading = "";
+    this.src = "";
+    this.alt = "";
+    this.description = "";
   }
 
   // Lit reactive properties
@@ -35,7 +38,10 @@ export class InstaPhotos extends DDDSuper(I18NMixin(LitElement)) {
       ...super.properties,
       active: { type: Boolean, reflect: true },
       topHeading: { type: String },
-      secondHeading: { type: String }
+      secondHeading: { type: String },
+      src: { type: String },
+      alt: { type: String },
+      description: { type: String }
     };
   }
 
@@ -92,9 +98,10 @@ export class InstaPhotos extends DDDSuper(I18NMixin(LitElement)) {
         border-radius: 6px;
         border: 3px solid rgba(0,0,0,0.05);
       }
-      .line {
-        border-top: 1px solid var(--ddd-theme-default-beaverBlue);
-        font-size: 10px;
+      .image-description {
+        margin: 0 0 var(--ddd-spacing-2) 0;
+        font-size: var(--ddd-font-size-sm);
+        color: var(--ddd-theme-default-slateGray);
       }
     `];
   }
@@ -105,7 +112,8 @@ export class InstaPhotos extends DDDSuper(I18NMixin(LitElement)) {
 <div class="slide-content">
   ${this.topHeading ? html`<h2>${this.topHeading}</h2>` : ""}
   ${this.secondHeading ? html`<h3>${this.secondHeading}</h3>` : ""}
-  <div class="line"></div>
+  ${this.active && this.src ? html`<img src="${this.src}" alt="${this.alt || this.secondHeading || 'Slide image'}" style="max-width: 100%; max-height: 100%; object-fit: contain; margin-bottom: var(--ddd-spacing-2);" />` : ""}
+  ${this.description ? html`<p class="image-description">${this.description}</p>` : ""}
   <div class="body">
     <slot></slot>
   </div>

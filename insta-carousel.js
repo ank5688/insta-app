@@ -31,6 +31,7 @@ export class InstaApp extends DDDSuper(I18NMixin(LitElement)) {
     this.index = 0;           // starting index via attribute
     this.currentIndex = 0;
     this.slides = [];
+    this.images = [];
     this._updateSlides();
   }
 
@@ -55,6 +56,7 @@ export class InstaApp extends DDDSuper(I18NMixin(LitElement)) {
         background-color: var(--ddd-theme-default-slateMaxLight);
         font-family: var(--ddd-font-navigation);
         box-shadow: var(--playlist-project-box-shadow, 0 2px 4px rgba(0,0,0,0.25));
+        height: 550px;
       }
       :host(:hover) {
         box-shadow: var(--playlist-project-box-shadow-hover, 0 4px 8px rgba(0,0,0,0.45));
@@ -63,22 +65,50 @@ export class InstaApp extends DDDSuper(I18NMixin(LitElement)) {
         margin: var(--ddd-spacing-2);
         padding: var(--ddd-spacing-4);
         position: relative;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        min-height: 0;
       }
       h span {
         font-size: var(--playlist-project-label-font-size-xxlg, var(--ddd-font-size-xxlg));
       }
-      .arrow{
+      .content {
+        flex: 1;
+        min-height: 0;
+        overflow: auto;
+      }
+      .bottom-controls {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 var(--ddd-spacing-2);
+        margin-top: var(--ddd-spacing-2);
+        margin-bottom: var(--ddd-spacing-8);
+      }
+      button {
+        background-color: rgba(255,255,255,0.8);
+        color: var(--ddd-theme-default-beaverBlue);
+        border: 1px solid var(--ddd-theme-default-beaverBlue);
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        cursor: pointer;
+        font-size: 1.25rem;
         display: flex;
         align-items: center;
-        justify-content: space-between;
-        margin-left: -60px;
-        margin-right: -60px;
+        justify-content: center;
+      }
+      button:hover {
+        background-color: white;
+      }
+      button:disabled {
+        opacity: 0.3;
+        cursor: not-allowed;
       }
     
       slide-indicator {
-        position: absolute;
-        bottom: var(--ddd-spacing-1);
-        left: var(--ddd-spacing-4);
+        margin-bottom: var(--ddd-spacing-1);
       }
     `];
   }
@@ -88,20 +118,18 @@ export class InstaApp extends DDDSuper(I18NMixin(LitElement)) {
     return html`
 <div class="wrapper">
   <h3><span>${this.t.title}</span> ${this.title}</h3>
-  <slot></slot>
-  <div class="arrow">
-    <insta-arrows
-      .index=${this.currentIndex}
-      .total=${this.slides ? this.slides.length : 0}
-      @prev-clicked=${this.prev}
-      @next-clicked=${this.next}>
-    </insta-arrows>
+  <div class="content">
+    <slot></slot>
   </div>
-  <insta-indicators
-    @playlist-index-changed=${this.handleEvent}
-    .total=${this.slides ? this.slides.length : 0}
-    .currentIndex=${this.currentIndex}>
-  </insta-indicators>
+  <div class="bottom-controls">
+    <button class="prev" ?disabled="${this.currentIndex === 0}" @click=${this.prev}>&lt;</button>
+    <insta-indicators
+      @playlist-index-changed=${this.handleEvent}
+      .total=${this.slides ? this.slides.length : 0}
+      .currentIndex=${this.currentIndex}>
+    </insta-indicators>
+    <button class="next" ?disabled="${this.currentIndex === this.slides.length - 1}" @click=${this.next}>&gt;</button>
+  </div>
   </div>`;
   }
 
@@ -136,6 +164,9 @@ export class InstaApp extends DDDSuper(I18NMixin(LitElement)) {
     // set the starting index from attribute
     this.currentIndex = this.index || 0;
     this._updateSlides();
+
+    // fetch images
+    this.fetchImages();
   }
 
   _updateSlides() {
@@ -154,6 +185,38 @@ export class InstaApp extends DDDSuper(I18NMixin(LitElement)) {
     this.slides.forEach((slide, i) => {
       slide.active = i === this.currentIndex;
     });
+
+    // assign images if available
+    this._assignImages();
+  }
+
+  _assignImages() {
+    this.slides.forEach((slide, i) => {
+      if (this.images[i]) {
+        slide.src = this.images[i];
+        slide.alt = `Fox image ${i + 1}`;
+      }
+
+    });
+  }
+
+  async fetchImages() {
+    const promises = [];
+    for (let i = 0; i < 15; i++) {
+      promises.push(
+        fetch("https://randomfox.ca/floof/")
+          .then((resp) => {
+            if (resp.ok) {
+              return resp.json();
+            }
+            return null;
+          })
+          .then((data) => data ? data.image : null)
+      );
+    }
+    const urls = await Promise.all(promises);
+    this.images = urls.filter(url => url !== null);
+    this._assignImages();
   }
 
   updated(changed) {
