@@ -31,7 +31,7 @@ export class InstaApp extends DDDSuper(I18NMixin(LitElement)) {
     this.index = 0;           // starting index via attribute
     this.currentIndex = 0;
     this.slides = [];
-    this.images = [];
+    this.images = []; // initialize as array
     this._updateSlides();
   }
 
@@ -188,6 +188,9 @@ export class InstaApp extends DDDSuper(I18NMixin(LitElement)) {
 
     // assign images if available
     this._assignImages();
+
+    // fetch image for current slide if not already fetched
+    this.fetchImageForSlide(this.currentIndex);
   }
 
   _assignImages() {
@@ -200,23 +203,18 @@ export class InstaApp extends DDDSuper(I18NMixin(LitElement)) {
     });
   }
 
-  async fetchImages() {
-    const promises = [];
-    for (let i = 0; i < 15; i++) {
-      promises.push(
-        fetch("https://randomfox.ca/floof/")
-          .then((resp) => {
-            if (resp.ok) {
-              return resp.json();
-            }
-            return null;
-          })
-          .then((data) => data ? data.image : null)
-      );
+  async fetchImageForSlide(index) {
+    if (this.images[index]) return; // already fetched
+    try {
+      const resp = await fetch("https://randomfox.ca/floof/");
+      if (resp.ok) {
+        const data = await resp.json();
+        this.images[index] = data.image;
+        this._assignImages();
+      }
+    } catch (error) {
+      console.error("Failed to fetch image for slide", index, error);
     }
-    const urls = await Promise.all(promises);
-    this.images = urls.filter(url => url !== null);
-    this._assignImages();
   }
 
   updated(changed) {
