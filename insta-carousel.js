@@ -32,6 +32,7 @@ export class InstaApp extends DDDSuper(I18NMixin(LitElement)) {
     this.currentIndex = 0;
     this.slides = [];
     this.images = []; // initialize as array
+    this.authors = []; // initialize as array
     this._updateSlides();
   }
 
@@ -117,7 +118,9 @@ export class InstaApp extends DDDSuper(I18NMixin(LitElement)) {
   render() {
     return html`
 <div class="wrapper">
-  <h3><span>${this.t.title}</span> ${this.title}</h3>
+  <h3>
+    <span>${this.t.title}</span> ${this.title}
+  </h3>
   <div class="content">
     <slot></slot>
   </div>
@@ -165,8 +168,8 @@ export class InstaApp extends DDDSuper(I18NMixin(LitElement)) {
     this.currentIndex = this.index || 0;
     this._updateSlides();
 
-    // fetch images
-    this.fetchImages();
+    // load images from JSON
+    this.loadData();
   }
 
   _updateSlides() {
@@ -186,35 +189,38 @@ export class InstaApp extends DDDSuper(I18NMixin(LitElement)) {
       slide.active = i === this.currentIndex;
     });
 
+    // set current author photo
+    // (removed as no longer needed)
+
     // assign images if available
     this._assignImages();
+  }
 
-    // fetch image for current slide if not already fetched
-    this.fetchImageForSlide(this.currentIndex);
+  async loadData() {
+    try {
+      const resp = await fetch('./data.json');
+      const data = await resp.json();
+      this.images = data.images || [];
+      this.authors = data.authors || [];
+      this._assignImages();
+    } catch (error) {
+      console.error('Failed to load data.json', error);
+    }
   }
 
   _assignImages() {
     this.slides.forEach((slide, i) => {
       if (this.images[i]) {
-        slide.src = this.images[i];
-        slide.alt = `Fox image ${i + 1}`;
+        slide.src = this.images[i].url;
+        slide.alt = this.images[i].caption || `Image ${i + 1}`;
+        const author = this.authors.find(a => a.id === this.images[i].authorId);
+        if (author) {
+          slide.topHeading = author.name;
+          slide.authorPhoto = author.photo;
+        }
+        slide.description = this.images[i].caption;
       }
-
     });
-  }
-
-  async fetchImageForSlide(index) {
-    if (this.images[index]) return; // already fetched
-    try {
-      const resp = await fetch("https://randomfox.ca/floof/");
-      if (resp.ok) {
-        const data = await resp.json();
-        this.images[index] = data.image;
-        this._assignImages();
-      }
-    } catch (error) {
-      console.error("Failed to fetch image for slide", index, error);
-    }
   }
 
   updated(changed) {

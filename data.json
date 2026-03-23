@@ -1,0 +1,24 @@
+{
+      "images": [
+        {
+            "id": 1,
+            "authorId": 1,
+            "url": "alligator.jpg",
+            "caption": "Alligator looking miffed"
+        },
+        {
+            "id": 2,
+            "authorId": 1,
+            "url": "dog.jpg",
+            "caption": "dog going through it"
+        }
+    ],
+
+    "authors": [
+        {
+            "id": 1,
+            "name": "Alice",
+            "photo": "userIcon.jpg"
+        }
+    ]
+}

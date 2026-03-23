@@ -30,6 +30,7 @@ export class InstaPhotos extends DDDSuper(I18NMixin(LitElement)) {
     this.src = "";
     this.alt = "";
     this.description = "";
+    this.authorPhoto = "";
   }
 
   // Lit reactive properties
@@ -41,7 +42,8 @@ export class InstaPhotos extends DDDSuper(I18NMixin(LitElement)) {
       secondHeading: { type: String },
       src: { type: String },
       alt: { type: String },
-      description: { type: String }
+      description: { type: String },
+      authorPhoto: { type: String }
     };
   }
 
@@ -72,10 +74,6 @@ export class InstaPhotos extends DDDSuper(I18NMixin(LitElement)) {
         font-weight: var(--playlist-slide-heading-top-font-weight, normal);
         color: var(--playlist-slide-heading-color, var(--ddd-theme-default-beaverBlue));
         letter-spacing: 0.02em;
-      }
-      h3 {
-        font-size: var(--playlist-slide-heading-second-font-size, var(--ddd-font-size-xxxlg));
-        margin: var(--ddd-spacing-2) 0;
       }
       .body {
         flex: 1;
@@ -109,8 +107,7 @@ export class InstaPhotos extends DDDSuper(I18NMixin(LitElement)) {
   render() {
     return html`
 <div class="slide-content">
-  ${this.topHeading ? html`<h2>${this.topHeading}</h2>` : ""}
-  ${this.secondHeading ? html`<h3>${this.secondHeading}</h3>` : ""}
+  ${this.topHeading ? html`<h2><img src="${this.authorPhoto}" alt="User icon" style="width: 50px; height: 50px; margin-right: 10px; vertical-align: middle;">${this.topHeading}</h2>` : ""}
   ${this.active && this.src ? html`<img src="${this.src}" alt="${this.alt || this.secondHeading || 'Slide image'}" loading="lazy" style="max-width: 100%; max-height: 80%; object-fit: contain; margin-bottom: var(--ddd-spacing-2);" />` : ""}
   ${this.description ? html`<p class="image-description">${this.description}</p>` : ""}
   <div class="body">
