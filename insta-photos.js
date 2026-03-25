@@ -31,6 +31,8 @@ export class InstaPhotos extends DDDSuper(I18NMixin(LitElement)) {
     this.alt = "";
     this.description = "";
     this.authorPhoto = "";
+    this.liked = false;
+    this.imageId = null;
   }
 
   // Lit reactive properties
@@ -43,7 +45,9 @@ export class InstaPhotos extends DDDSuper(I18NMixin(LitElement)) {
       src: { type: String },
       alt: { type: String },
       description: { type: String },
-      authorPhoto: { type: String }
+      authorPhoto: { type: String },
+      liked: { type: Boolean },
+      imageId: { type: Number }
     };
   }
 
@@ -97,8 +101,37 @@ export class InstaPhotos extends DDDSuper(I18NMixin(LitElement)) {
       }
       .image-description {
         margin: 0 0 var(--ddd-spacing-2) 0;
+        margin-left: 5px;
         font-size: var(--ddd-font-size-sm);
         color: var(--ddd-theme-default-slateGray);
+      }
+      .description-with-heart {
+        display: flex;
+        align-items: flex-start;
+        gap: var(--ddd-spacing-1);
+        margin: 0 0 var(--ddd-spacing-2) 0;
+      }
+      .heart-button {
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 40px;
+        flex-shrink: 0;
+        margin-top: -4px;
+        margin-left: 70px;
+      }
+      .heart-button img {
+        width: 30px;
+        height: 30px;
+        object-fit: contain;
+        object-position: center;
+      }
+      .heart-button:hover {
+        opacity: 0.7;
       }
     `];
   }
@@ -107,14 +140,30 @@ export class InstaPhotos extends DDDSuper(I18NMixin(LitElement)) {
   render() {
     return html`
 <div class="slide-content">
-  ${this.topHeading ? html`<h2><img src="${this.authorPhoto}" alt="User icon" style="width: 50px; height: 50px; margin-right: 10px; vertical-align: middle;">${this.topHeading}</h2>` : ""}
+  ${this.topHeading ? html`<h2><img src="${this.authorPhoto}" alt="User icon" style="width: 50px; height: 50px; margin-right: 5px; margin-top: -7px; vertical-align: middle;">${this.topHeading}</h2>` : ""}
   ${this.active && this.src ? html`<img src="${this.src}" alt="${this.alt || this.secondHeading || 'Slide image'}" loading="lazy" style="max-width: 100%; max-height: 80%; object-fit: contain; margin-bottom: var(--ddd-spacing-2);" />` : ""}
-  ${this.description ? html`<p class="image-description">${this.description}</p>` : ""}
+  ${this.description ? html`
+    <div class="description-with-heart">
+      <button class="heart-button" @click="${this._toggleLike}" title="Like this photo">
+        <img src="${this.liked ? 'like-icon.png' : 'unlike-icon.png'}" alt="${this.liked ? 'Unlike' : 'Like'}" />
+      </button>
+      <p class="image-description">${this.description}</p>
+    </div>
+  ` : ""}
   <div class="body">
     <slot></slot>
   </div>
 </div>`;
-}
+  }
+
+  _toggleLike() {
+    this.liked = !this.liked;
+    this.dispatchEvent(new CustomEvent('like-toggled', {
+      detail: { imageId: this.imageId, liked: this.liked },
+      bubbles: true,
+      composed: true
+    }));
+  }
 }
 
 globalThis.customElements.define(InstaPhotos.tag, InstaPhotos);

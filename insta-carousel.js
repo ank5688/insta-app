@@ -57,7 +57,7 @@ export class InstaApp extends DDDSuper(I18NMixin(LitElement)) {
         background-color: var(--ddd-theme-default-slateMaxLight);
         font-family: var(--ddd-font-navigation);
         box-shadow: var(--playlist-project-box-shadow, 0 2px 4px rgba(0,0,0,0.25));
-        height: 550px;
+        height: 520px;
       }
       :host(:hover) {
         box-shadow: var(--playlist-project-box-shadow-hover, 0 4px 8px rgba(0,0,0,0.45));
@@ -162,14 +162,31 @@ export class InstaApp extends DDDSuper(I18NMixin(LitElement)) {
     slot.addEventListener('slotchange', () => {
       this.slides = Array.from(this.querySelectorAll('insta-photos'));
       this._updateSlides();
+      this._attachLikeListeners();
     });
 
     // set the starting index from attribute
     this.currentIndex = this.index || 0;
     this._updateSlides();
+    this._attachLikeListeners();
 
     // load images from JSON
     this.loadData();
+  }
+
+  _attachLikeListeners() {
+    this.slides.forEach(slide => {
+      slide.removeEventListener('like-toggled', this._handleLikeToggle);
+      slide.addEventListener('like-toggled', this._handleLikeToggle.bind(this));
+    });
+  }
+
+  _handleLikeToggle(e) {
+    const { imageId, liked } = e.detail;
+    // Save to localStorage
+    const likedImages = JSON.parse(localStorage.getItem('likedImages') || '{}');
+    likedImages[imageId] = liked;
+    localStorage.setItem('likedImages', JSON.stringify(likedImages));
   }
 
   _updateSlides() {
@@ -202,6 +219,14 @@ export class InstaApp extends DDDSuper(I18NMixin(LitElement)) {
       const data = await resp.json();
       this.images = data.images || [];
       this.authors = data.authors || [];
+      
+      // Load liked state from localStorage
+      const likedImages = JSON.parse(localStorage.getItem('likedImages') || '{}');
+      this.images = this.images.map(image => ({
+        ...image,
+        liked: likedImages[image.id] !== undefined ? likedImages[image.id] : image.liked
+      }));
+      
       this._assignImages();
     } catch (error) {
       console.error('Failed to load data.json', error);
@@ -213,6 +238,8 @@ export class InstaApp extends DDDSuper(I18NMixin(LitElement)) {
       if (this.images[i]) {
         slide.src = this.images[i].url;
         slide.alt = this.images[i].caption || `Image ${i + 1}`;
+        slide.imageId = this.images[i].id;
+        slide.liked = this.images[i].liked || false;
         const author = this.authors.find(a => a.id === this.images[i].authorId);
         if (author) {
           slide.topHeading = author.name;

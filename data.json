@@ -4,13 +4,57 @@
             "id": 1,
             "authorId": 1,
             "url": "alligator.jpg",
-            "caption": "Alligator looking miffed"
+            "caption": "Alligator looking miffed",
+            "liked": false
         },
         {
             "id": 2,
             "authorId": 1,
             "url": "dog.jpg",
-            "caption": "dog going through it"
+            "caption": "dog going through it",
+            "liked": false
+        },
+        {
+            "id": 3,
+            "authorId": 1,
+            "url": "bear-taxi.jpg",
+            "caption": "bear in a taxi",
+            "liked": false
+        },
+        {
+            "id": 4,
+            "authorId": 1,
+            "url": "deer-look.jpg",
+            "caption": "deer looking at you",
+            "liked": false
+        },
+        {
+            "id": 5,
+            "authorId": 1,
+            "url": "dog-shock.jpg",
+            "caption": "dog looking shocked",
+            "liked": false
+        },
+        {
+            "id": 6,
+            "authorId": 1,
+            "url": "excuse-shark.jpg",
+            "caption": "shark is astounded",
+            "liked": false
+        },
+        {
+            "id": 7,
+            "authorId": 1,
+            "url": "hamster-face.jpg",
+            "caption": "hamster going thru it",
+            "liked": false
+        },
+        {
+            "id": 8,
+            "authorId": 1,
+            "url": "shark-shocked.jpg",
+            "caption": "shark looking shocked",
+            "liked": false
         }
     ],
 
@@ -18,7 +62,7 @@
         {
             "id": 1,
             "name": "Alice",
-            "photo": "userIcon.jpg"
+            "photo": "userIcon.png"
         }
     ]
 }
