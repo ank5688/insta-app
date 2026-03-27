@@ -1,5 +1,5 @@
 {
-    "images": [
+    "images"; [
         {
             "id": 1,
             "authorId": 1,
@@ -106,7 +106,7 @@
             "liked": false
         }
     ],
-    "authors": [
+    "authors"; [
         {
             "id": 1,
             "name": "Alice",

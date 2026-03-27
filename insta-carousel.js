@@ -215,7 +215,7 @@ export class InstaApp extends DDDSuper(I18NMixin(LitElement)) {
 
   async loadData() {
     try {
-      const resp = await fetch('./data.json');
+      const resp = await fetch('./api/data.json');
       const data = await resp.json();
       this.images = data.images || [];
       this.authors = data.authors || [];
