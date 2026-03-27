@@ -23,6 +23,7 @@ export class InstaIndicators extends DDDSuper(I18NMixin(LitElement)) {
     super();
     this.total = 0;
     this.currentIndex = 0;
+    this.thumbnails = [];
   }
 
   // Lit reactive properties
@@ -31,6 +32,7 @@ export class InstaIndicators extends DDDSuper(I18NMixin(LitElement)) {
       ...super.properties,
       total: { type: Number },
       currentIndex: { type: Number },
+      thumbnails: { type: Array }
     };
   }
 
@@ -39,43 +41,52 @@ export class InstaIndicators extends DDDSuper(I18NMixin(LitElement)) {
     return [super.styles,
     css`
       :host {
-        display: block;
-      }
-      .dots {
-        display: flex;
-        justify-content: center;
-        gap: var(--ddd-spacing-2);
-        padding: var(--ddd-spacing-2);
-      }
-      .dot {
-        width: 14px;
-        height: 14px;
-        border-radius: 50%;
-        background-color: var(--ddd-theme-default-beaverBlue);
-        opacity: 0.4;
-        cursor: pointer;
-        transition: opacity 0.2s;
-      }
-      .dot.active {
-        opacity: 1;
-      }
+      display: block;
+    }
+    .thumbs {
+      display: flex;
+      justify-content: center;
+      gap: var(--ddd-spacing-1);
+      padding: var(--ddd-spacing-2);
+      flex-wrap: wrap;
+    }
+    .thumb {
+      width: 40px;
+      height: 40px;
+      object-fit: cover;
+      border-radius: 4px;
+      opacity: 0.45;
+      cursor: pointer;
+      transition: opacity 0.2s, outline 0.2s;
+      outline: 2px solid transparent;
+    }
+    .thumb.active {
+      opacity: 1;
+      outline: 2px solid var(--ddd-theme-default-beaverBlue);
+    }
+    .thumb:hover {
+      opacity: 0.8;
+    }
     `];
   }
 
-  // Lit render the HTML
-  render() {
-    let dots = [];
-    for (let i = 0; i < this.total; i++) {
-      dots.push(html`
-        <span @click="${this._handleDotClick}" data-index="${i}" class="dot ${i === this.currentIndex ? 'active' : ''}"></span>
-      `);
-    }
-    return html`
-    <div class="dots">
-      ${dots}
-    </div>`;
+ render() {
+  const items = [];
+  for (let i = 0; i < this.total; i++) {
+    const src = this.thumbnails[i] || '';
+    items.push(html`
+      <img
+        class="thumb ${i === this.currentIndex ? 'active' : ''}"
+        src="${src}"
+        alt="Go to image ${i + 1}"
+        data-index="${i}"
+        @click="${this._handleThumbClick}"
+      />
+    `);
   }
-  _handleDotClick(e) {
+  return html`<div class="thumbs">${items}</div>`;
+}
+  _handleThumbClick(e) {
     const indexChange = new CustomEvent("playlist-index-changed", {
       composed: true,
       bubbles: true,

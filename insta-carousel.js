@@ -123,7 +123,7 @@ export class InstaApp extends DDDSuper(I18NMixin(LitElement)) {
   </h3>
   <div class="content">
     <slot></slot>
-  </div>
+ </div>
   <div class="bottom-controls">
     <button class="prev" ?disabled="${this.currentIndex === 0}" @click=${this.prev}>&lt;</button>
     <insta-indicators
@@ -166,11 +166,6 @@ export class InstaApp extends DDDSuper(I18NMixin(LitElement)) {
     });
 
     // set the starting index from attribute
-    this.currentIndex = this.index || 0;
-    this._updateSlides();
-    this._attachLikeListeners();
-
-    // load images from JSON
     this.loadData();
   }
 
@@ -193,7 +188,6 @@ export class InstaApp extends DDDSuper(I18NMixin(LitElement)) {
     // refresh slide list in case it has changed
     this.slides = Array.from(this.querySelectorAll('insta-photos'));
 
-    // clamp currentIndex
     if (this.currentIndex < 0) {
       this.currentIndex = 0;
     }
@@ -201,21 +195,17 @@ export class InstaApp extends DDDSuper(I18NMixin(LitElement)) {
       this.currentIndex = this.slides.length - 1;
     }
 
-    // update slide elements via their `active` property
     this.slides.forEach((slide, i) => {
       slide.active = i === this.currentIndex;
+      slide.currentIndex = i;
     });
 
-    // set current author photo
-    // (removed as no longer needed)
-
-    // assign images if available
     this._assignImages();
   }
 
   async loadData() {
     try {
-      const resp = await fetch('./api/data.json');
+      const resp = await fetch('./data.json');
       const data = await resp.json();
       this.images = data.images || [];
       this.authors = data.authors || [];
@@ -227,25 +217,33 @@ export class InstaApp extends DDDSuper(I18NMixin(LitElement)) {
         liked: likedImages[image.id] !== undefined ? likedImages[image.id] : image.liked
       }));
       
-      this._assignImages();
+      this.slides = Array.from(this.querySelectorAll('insta-photos'));
+
+      this._readIndexFromURL();
+      this._updateSlides();
+      this._attachLikeListeners();
     } catch (error) {
       console.error('Failed to load data.json', error);
     }
   }
 
   _assignImages() {
+    const base = new URL('./', import.meta.url).href;
     this.slides.forEach((slide, i) => {
       if (this.images[i]) {
-        slide.src = this.images[i].url;
-        slide.alt = this.images[i].caption || `Image ${i + 1}`;
-        slide.imageId = this.images[i].id;
-        slide.liked = this.images[i].liked || false;
-        const author = this.authors.find(a => a.id === this.images[i].authorId);
-        if (author) {
-          slide.topHeading = author.name;
-          slide.authorPhoto = author.photo;
-        }
-        slide.description = this.images[i].caption;
+        const image = this.images[i];
+        const author = this.authors.find(a => a.id === image.authorId) || {};
+        
+        slide.src = slide.active ? (base + (image.fullsize || image.thumbnail)) : (base + (image.thumbnail || ''));
+        slide.thumbnail = image.thumbnail;
+        slide.fullsize = image.fullsize;
+        slide.alt = image.caption || image.name || `Image ${i + 1}`;'';
+        slide.description = image.caption || '';
+        slide.authorPhoto = author.photo ? base + author.photo : '';
+        slide.authorSince = author.since || '';
+        slide.authorChannel = author.channel || '';
+        slide.liked = image.liked || false;
+        slide.imageId = image.id;
       }
     });
   }

@@ -28,9 +28,14 @@ export class InstaPhotos extends DDDSuper(I18NMixin(LitElement)) {
     this.topHeading = "";
     this.secondHeading = "";
     this.src = "";
+    this.thumbnail = "";
+    this.fullsize = "";
+    this.currentIndex = 0;
     this.alt = "";
     this.description = "";
     this.authorPhoto = "";
+    this.authorSince = "";
+    this.authorChannel = "";
     this.liked = false;
     this.imageId = null;
   }
@@ -43,9 +48,14 @@ export class InstaPhotos extends DDDSuper(I18NMixin(LitElement)) {
       topHeading: { type: String },
       secondHeading: { type: String },
       src: { type: String },
+      thumbnail: { type: String },
+      fullsize: { type: String },
+      currentIndex: { type: Number },
       alt: { type: String },
       description: { type: String },
       authorPhoto: { type: String },
+      authorSince: { type: String },
+      authorChannel: { type: String },
       liked: { type: Boolean },
       imageId: { type: Number }
     };
@@ -133,6 +143,17 @@ export class InstaPhotos extends DDDSuper(I18NMixin(LitElement)) {
       .heart-button:hover {
         opacity: 0.7;
       }
+      @media (prefers-color-scheme: dark) {
+        :host {
+          color: var(--ddd-theme-default-white);
+          background-color: rgba(0,0,0,0.6);
+        }
+        .image-description,
+        h2,
+        p {
+          color: var(--ddd-theme-default-white);
+        }
+      }
     `];
   }
 
@@ -140,8 +161,9 @@ export class InstaPhotos extends DDDSuper(I18NMixin(LitElement)) {
   render() {
     return html`
 <div class="slide-content">
-  ${this.topHeading ? html`<h2><img src="${this.authorPhoto}" alt="User icon" style="width: 50px; height: 50px; margin-right: 5px; margin-top: -7px; vertical-align: middle;">${this.topHeading}</h2>` : ""}
-  ${this.active && this.src ? html`<img src="${this.src}" alt="${this.alt || this.secondHeading || 'Slide image'}" loading="lazy" style="max-width: 100%; max-height: 80%; object-fit: contain; margin-bottom: var(--ddd-spacing-2);" />` : ""}
+   ${this.topHeading ? html`<h2><img src="${this.authorPhoto}" alt="User icon" style="width: 50px; height: 50px; margin-right: 5px; margin-top: -7px; vertical-align: middle;">${this.topHeading}</h2>` : ""}
+  ${this.authorChannel || this.authorSince ? html`<p style="font-size:.8rem; margin: 0; color: var(--ddd-theme-default-slateGray);">${this.authorChannel ? `${this.authorChannel}` : ''}${this.authorChannel && this.authorSince ? ' · ' : ''}${this.authorSince ? `User since ${this.authorSince}` : ''}</p>` : ''}
+  ${this.active ? html`${(this.src || this.fullsize || this.thumbnail) ? html`<img src="${this.src || this.fullsize || this.thumbnail}" alt="${this.alt || 'Slide image'}" style="max-width: 100%; max-height: 80%; object-fit: contain; margin-bottom: var(--ddd-spacing-2);" />` : html`<p>No image source available</p>`}` : ""}
   ${this.description ? html`
     <div class="description-with-heart">
       <button class="heart-button" @click="${this._toggleLike}" title="Like this photo">
@@ -164,6 +186,8 @@ export class InstaPhotos extends DDDSuper(I18NMixin(LitElement)) {
       composed: true
     }));
   }
+
+  
 }
 
 globalThis.customElements.define(InstaPhotos.tag, InstaPhotos);
