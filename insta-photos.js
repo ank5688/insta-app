@@ -71,7 +71,7 @@ export class InstaPhotos extends DDDSuper(I18NMixin(LitElement)) {
         width: 100%;
         height: 100%;
         color: var(--playlist-project-text-color, #001f3f);
-        padding: var(--ddd-spacing-4) var(--ddd-spacing-6);
+        padding: var(--ddd-spacing-2) var(--ddd-spacing-6) var(--ddd-spacing-4) var(--ddd-spacing-6);
       }
       :host([active]) {
         display: block;
@@ -85,7 +85,7 @@ export class InstaPhotos extends DDDSuper(I18NMixin(LitElement)) {
         font-size: var(--playlist-slide-heading-top-font-size, var(--ddd-font-size-lg));
         margin: 0;
         text-transform: uppercase;
-        font-weight: var(--playlist-slide-heading-top-font-weight, normal);
+        font-weight: bold;
         color: var(--playlist-slide-heading-color, var(--ddd-theme-default-beaverBlue));
         letter-spacing: 0.02em;
       }
@@ -109,49 +109,15 @@ export class InstaPhotos extends DDDSuper(I18NMixin(LitElement)) {
         border-radius: 6px;
         border: 3px solid rgba(0,0,0,0.05);
       }
-      .image-description {
-        margin: 0 0 var(--ddd-spacing-2) 0;
-        margin-left: 5px;
-        font-size: var(--ddd-font-size-sm);
-        color: var(--ddd-theme-default-slateGray);
-      }
-      .description-with-heart {
-        display: flex;
-        align-items: flex-start;
-        gap: var(--ddd-spacing-1);
-        margin: 0 0 var(--ddd-spacing-2) 0;
-      }
-      .heart-button {
-        background: none;
-        border: none;
-        cursor: pointer;
-        padding: 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        min-width: 40px;
-        flex-shrink: 0;
-        margin-top: -4px;
-        margin-left: 70px;
-      }
-      .heart-button img {
-        width: 30px;
-        height: 30px;
-        object-fit: contain;
-        object-position: center;
-      }
-      .heart-button:hover {
-        opacity: 0.7;
-      }
       @media (prefers-color-scheme: dark) {
         :host {
-          color: var(--ddd-theme-default-white);
-          background-color: rgba(0,0,0,0.6);
+          color: #001f3f;
+          background-color: #f8f9fa;
         }
         .image-description,
         h2,
         p {
-          color: var(--ddd-theme-default-white);
+          color: #001f3f;
         }
       }
     `];
@@ -163,15 +129,7 @@ export class InstaPhotos extends DDDSuper(I18NMixin(LitElement)) {
 <div class="slide-content">
    ${this.topHeading ? html`<h2><img src="${this.authorPhoto}" alt="User icon" style="width: 50px; height: 50px; margin-right: 5px; margin-top: -7px; vertical-align: middle;">${this.topHeading}</h2>` : ""}
   ${this.authorChannel || this.authorSince ? html`<p style="font-size:.8rem; margin: 0; color: var(--ddd-theme-default-slateGray);">${this.authorChannel ? `${this.authorChannel}` : ''}${this.authorChannel && this.authorSince ? ' · ' : ''}${this.authorSince ? `User since ${this.authorSince}` : ''}</p>` : ''}
-  ${this.active ? html`${(this.src || this.fullsize || this.thumbnail) ? html`<img src="${this.src || this.fullsize || this.thumbnail}" alt="${this.alt || 'Slide image'}" style="max-width: 100%; max-height: 80%; object-fit: contain; margin-bottom: var(--ddd-spacing-2);" />` : html`<p>No image source available</p>`}` : ""}
-  ${this.description ? html`
-    <div class="description-with-heart">
-      <button class="heart-button" @click="${this._toggleLike}" title="Like this photo">
-        <img src="${this.liked ? 'like-icon.png' : 'unlike-icon.png'}" alt="${this.liked ? 'Unlike' : 'Like'}" />
-      </button>
-      <p class="image-description">${this.description}</p>
-    </div>
-  ` : ""}
+  ${this.active ? html`${(this.src || this.fullsize || this.thumbnail) ? html`<img src="${this.src || this.fullsize || this.thumbnail}" alt="${this.alt || 'Slide image'}" style="max-width: 100%; max-height: 80%; object-fit: contain; margin-bottom: var(--ddd-spacing-1);" />` : html`<p>No image source available</p>`}` : ""}
   <div class="body">
     <slot></slot>
   </div>

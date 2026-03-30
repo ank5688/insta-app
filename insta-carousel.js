@@ -33,6 +33,10 @@ export class InstaApp extends DDDSuper(I18NMixin(LitElement)) {
     this.slides = [];
     this.images = []; // initialize as array
     this.authors = []; // initialize as array
+    this.thumbnails = []; // initialize thumbnails array
+    this.currentDescription = "";
+    this.currentLiked = false;
+    this.currentImageId = null;
     this._updateSlides();
   }
 
@@ -43,7 +47,11 @@ export class InstaApp extends DDDSuper(I18NMixin(LitElement)) {
       topHeading: { type: String },
       secondHeading: { type: String },
       index: { type: Number, reflect: true },
-      currentIndex: { type: Number }
+      currentIndex: { type: Number },
+      thumbnails: { type: Array },
+      currentDescription: { type: String },
+      currentLiked: { type: Boolean },
+      currentImageId: { type: Number }
     };
   }
 
@@ -54,21 +62,23 @@ export class InstaApp extends DDDSuper(I18NMixin(LitElement)) {
       :host {
         display: block;
         color: var(--playlist-project-text-color, #001f3f);
-        background-color: var(--ddd-theme-default-slateMaxLight);
+        background-color: #f8f9fa;
         font-family: var(--ddd-font-navigation);
-        box-shadow: var(--playlist-project-box-shadow, 0 2px 4px rgba(0,0,0,0.25));
-        height: 520px;
-      }
-      :host(:hover) {
-        box-shadow: var(--playlist-project-box-shadow-hover, 0 4px 8px rgba(0,0,0,0.45));
+        box-shadow: 0 4px 8px rgba(0,0,0,0.30);
+        border: 2px solid #ccc;
+        border-radius: 12px;
+        height: 550px;
+        width: 100%;
+        max-width: 400px;
+        margin: 0;
       }
       .wrapper {
-        margin: var(--ddd-spacing-2);
-        padding: var(--ddd-spacing-4);
+        margin: var(--ddd-spacing-0);
+        padding: var(--ddd-spacing-2);
         position: relative;
         display: flex;
         flex-direction: column;
-        height: 100%;
+        height: 550px;
         min-height: 0;
       }
       h span {
@@ -77,17 +87,58 @@ export class InstaApp extends DDDSuper(I18NMixin(LitElement)) {
       .content {
         flex: 1;
         min-height: 0;
-        overflow: auto;
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
       }
       .bottom-controls {
         display: flex;
-        justify-content: space-between;
+        flex-direction: column;
         align-items: center;
         padding: 0 var(--ddd-spacing-2);
         margin-top: var(--ddd-spacing-2);
         margin-bottom: var(--ddd-spacing-8);
       }
-      button {
+      .indicators-container {
+        margin-bottom: var(--ddd-spacing-1);
+      }
+      .description-with-heart {
+        display: flex;
+        align-items: flex-start;
+        gap: var(--ddd-spacing-1);
+        margin: 0 0 var(--ddd-spacing-1) 0;
+      }
+      .heart-button {
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 40px;
+        flex-shrink: 0;
+        margin-top: -4px;
+        margin-left: -80px;
+      }
+      .heart-button img {
+        width: 30px;
+        height: 30px;
+        object-fit: contain;
+        object-position: center;
+      }
+      .heart-button:hover {
+        opacity: 0.7;
+      }
+      .image-description {
+        margin: 0 0 var(--ddd-spacing-2) 0;
+        margin-left: 5px;
+        font-size: var(--ddd-font-size-sm);
+        color: var(--ddd-theme-default-slateGray);
+      }
+      .arrow-btn {
+        position: absolute;
         background-color: rgba(255,255,255,0.8);
         color: var(--ddd-theme-default-beaverBlue);
         border: 1px solid var(--ddd-theme-default-beaverBlue);
@@ -99,17 +150,34 @@ export class InstaApp extends DDDSuper(I18NMixin(LitElement)) {
         display: flex;
         align-items: center;
         justify-content: center;
+        z-index: 1;
+        top: 50%;
+        transform: translateY(-50%);
       }
-      button:hover {
+      .arrow-btn:hover {
         background-color: white;
       }
-      button:disabled {
+      .arrow-btn:disabled {
         opacity: 0.3;
         cursor: not-allowed;
+      }
+      .prev-btn {
+        left: var(--ddd-spacing-2);
+      }
+      .next-btn {
+        right: var(--ddd-spacing-2);
       }
     
       slide-indicator {
         margin-bottom: var(--ddd-spacing-1);
+        margin-bottom: var(--ddd-spacing-2); --- IGNORE ---
+      }
+      @media (max-width: 600px) {
+        :host {
+          height: 450px;
+          max-width: 100%;
+          margin: var(--ddd-spacing-2);
+        }
       }
     `];
   }
@@ -122,16 +190,27 @@ export class InstaApp extends DDDSuper(I18NMixin(LitElement)) {
     <span>${this.t.title}</span> ${this.title}
   </h3>
   <div class="content">
+    <button class="arrow-btn prev-btn" ?disabled="${this.currentIndex === 0}" @click=${this.prev}>&lt;</button>
     <slot></slot>
- </div>
+    <button class="arrow-btn next-btn" ?disabled="${this.currentIndex === this.slides.length - 1}" @click=${this.next}>&gt;</button>
+  </div>
   <div class="bottom-controls">
-    <button class="prev" ?disabled="${this.currentIndex === 0}" @click=${this.prev}>&lt;</button>
-    <insta-indicators
-      @playlist-index-changed=${this.handleEvent}
-      .total=${this.slides ? this.slides.length : 0}
-      .currentIndex=${this.currentIndex}>
-    </insta-indicators>
-    <button class="next" ?disabled="${this.currentIndex === this.slides.length - 1}" @click=${this.next}>&gt;</button>
+    <div class="indicators-container">
+      <insta-indicators
+        @playlist-index-changed=${this.handleEvent}
+        .total=${this.slides ? this.slides.length : 0}
+        .currentIndex=${this.currentIndex}
+        .thumbnails=${this.thumbnails}>
+      </insta-indicators>
+    </div>
+    ${this.currentDescription ? html`
+      <div class="description-with-heart">
+        <button class="heart-button" @click="${this._toggleCurrentLike}" title="Like this photo">
+          <img src="${this.currentLiked ? 'like-icon.png' : 'unlike-icon.png'}" alt="${this.currentLiked ? 'Unlike' : 'Like'}" />
+        </button>
+        <p class="image-description">${this.currentDescription}</p>
+      </div>
+    ` : ""}
   </div>
   </div>`;
   }
@@ -182,6 +261,21 @@ export class InstaApp extends DDDSuper(I18NMixin(LitElement)) {
     const likedImages = JSON.parse(localStorage.getItem('likedImages') || '{}');
     likedImages[imageId] = liked;
     localStorage.setItem('likedImages', JSON.stringify(likedImages));
+    
+    // Update current liked status if this is the current image
+    if (imageId === this.currentImageId) {
+      this.currentLiked = liked;
+    }
+  }
+
+  _toggleCurrentLike() {
+    this.currentLiked = !this.currentLiked;
+    // Update the image data
+    if (this.images[this.currentIndex]) {
+      this.images[this.currentIndex].liked = this.currentLiked;
+    }
+    // Trigger the like toggle event
+    this._handleLikeToggle({ detail: { imageId: this.currentImageId, liked: this.currentLiked } });
   }
 
   _updateSlides() {
@@ -199,6 +293,14 @@ export class InstaApp extends DDDSuper(I18NMixin(LitElement)) {
       slide.active = i === this.currentIndex;
       slide.currentIndex = i;
     });
+
+    // Update current image data for display below thumbnails
+    if (this.images[this.currentIndex]) {
+      const currentImage = this.images[this.currentIndex];
+      this.currentDescription = currentImage.caption || '';
+      this.currentLiked = currentImage.liked || false;
+      this.currentImageId = currentImage.id;
+    }
 
     this._assignImages();
   }
@@ -229,6 +331,7 @@ export class InstaApp extends DDDSuper(I18NMixin(LitElement)) {
 
   _assignImages() {
     const base = new URL('./', import.meta.url).href;
+    this.thumbnails = []; // reset thumbnails array
     this.slides.forEach((slide, i) => {
       if (this.images[i]) {
         const image = this.images[i];
@@ -240,18 +343,34 @@ export class InstaApp extends DDDSuper(I18NMixin(LitElement)) {
         slide.alt = image.caption || image.name || `Image ${i + 1}`;'';
         slide.description = image.caption || '';
         slide.authorPhoto = author.photo ? base + author.photo : '';
-        slide.authorSince = author.since || '';
+        slide.authorSince = author.userSince || '';
         slide.authorChannel = author.channel || '';
+        slide.topHeading = author.name || '';
         slide.liked = image.liked || false;
         slide.imageId = image.id;
+
+        // Add thumbnail URL to thumbnails array
+        this.thumbnails.push(base + image.thumbnail);
       }
     });
   }
 
+  _readIndexFromURL() {
+    // Read index from URL hash or query params if needed
+    // For now, just ensure currentIndex is valid
+    if (this.currentIndex >= this.slides.length) {
+      this.currentIndex = 0;
+    }
+  }
+
   updated(changed) {
-    if (changed.has('index')) {
-      this.currentIndex = this.index || 0;
-      this._updateSlides();
+    super.updated(changed);
+    if (changed.has('currentIndex')) {
+      // Scroll the indicators to show the current image's thumbnail
+      const indicators = this.shadowRoot?.querySelector('insta-indicators');
+      if (indicators && typeof indicators.scrollToIndex === 'function') {
+        indicators.scrollToIndex(this.currentIndex);
+      }
     }
   }
 }
