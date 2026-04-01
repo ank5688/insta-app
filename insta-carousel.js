@@ -224,12 +224,14 @@ export class InstaApp extends DDDSuper(I18NMixin(LitElement)) {
   handleEvent(e) {
     this.currentIndex = e.detail.index;
     this._updateSlides();
+    this._updateURL();
   }
 
   next() {
     if (this.currentIndex < this.slides.length - 1) {
       this.currentIndex++;
       this._updateSlides();
+      this._updateURL();
     }
 
   }
@@ -238,6 +240,7 @@ export class InstaApp extends DDDSuper(I18NMixin(LitElement)) {
     if (this.currentIndex > 0) {
       this.currentIndex--;
       this._updateSlides();
+      this._updateURL();
     }
   }
 
@@ -333,6 +336,7 @@ export class InstaApp extends DDDSuper(I18NMixin(LitElement)) {
 
       this._readIndexFromURL();
       this._updateSlides();
+      this._updateURL();
       this._attachLikeListeners();
     } catch (error) {
       console.error('Failed to load data.json', error);
