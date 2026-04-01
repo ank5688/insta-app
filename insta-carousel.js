@@ -103,11 +103,15 @@ export class InstaApp extends DDDSuper(I18NMixin(LitElement)) {
       .indicators-container {
         margin-bottom: var(--ddd-spacing-1);
       }
-      .description-with-heart {
+     .description-with-heart {
         display: flex;
-        align-items: flex-start;
+        flex-direction: row;
+        align-items: center;
         gap: var(--ddd-spacing-1);
         margin: 0 0 var(--ddd-spacing-1) 0;
+        width: 100%;
+        box-sizing: border-box;
+        padding: 0 var(--ddd-spacing-2);
       }
       .heart-button {
         background: none;
@@ -119,8 +123,6 @@ export class InstaApp extends DDDSuper(I18NMixin(LitElement)) {
         justify-content: center;
         min-width: 40px;
         flex-shrink: 0;
-        margin-top: -4px;
-        margin-left: -80px;
       }
       .heart-button img {
         width: 30px;
@@ -132,11 +134,15 @@ export class InstaApp extends DDDSuper(I18NMixin(LitElement)) {
         opacity: 0.7;
       }
       .image-description {
-        margin: 0 0 var(--ddd-spacing-2) 0;
-        margin-left: 5px;
+        margin: 0;
         font-size: var(--ddd-font-size-sm);
         color: var(--ddd-theme-default-slateGray);
-      }
+        flex: 1;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
       .arrow-btn {
         position: absolute;
         background-color: rgba(255,255,255,0.8);
@@ -203,14 +209,14 @@ export class InstaApp extends DDDSuper(I18NMixin(LitElement)) {
         .thumbnails=${this.thumbnails}>
       </insta-indicators>
     </div>
-    ${this.currentDescription ? html`
+    ${html`
       <div class="description-with-heart">
         <button class="heart-button" @click="${this._toggleCurrentLike}" title="Like this photo">
           <img src="${this.currentLiked ? 'like-icon.png' : 'unlike-icon.png'}" alt="${this.currentLiked ? 'Unlike' : 'Like'}" />
         </button>
         <p class="image-description">${this.currentDescription}</p>
       </div>
-    ` : ""}
+    `}
   </div>
   </div>`;
   }
@@ -242,6 +248,10 @@ export class InstaApp extends DDDSuper(I18NMixin(LitElement)) {
       this.slides = Array.from(this.querySelectorAll('insta-photos'));
       this._updateSlides();
       this._attachLikeListeners();
+    });
+      window.addEventListener('hashchange', () => {
+      this._readIndexFromURL();
+      this._updateSlides();
     });
 
     // set the starting index from attribute
@@ -355,13 +365,26 @@ export class InstaApp extends DDDSuper(I18NMixin(LitElement)) {
     });
   }
 
-  _readIndexFromURL() {
-    // Read index from URL hash or query params if needed
-    // For now, just ensure currentIndex is valid
-    if (this.currentIndex >= this.slides.length) {
-      this.currentIndex = 0;
+_readIndexFromURL() {
+  const hash = window.location.hash; // e.g. "#image-3"
+  const match = hash.match(/^#image-(\d+)$/);
+  if (match) {
+    const imageNumber = parseInt(match[1], 10); // 1-based
+    const idx = imageNumber - 1;                // convert to 0-based
+    if (idx >= 0 && idx < this.slides.length) {
+      this.currentIndex = idx;
     }
+  } else if (this.currentIndex >= this.slides.length) {
+    this.currentIndex = 0;
   }
+}
+
+_updateURL() {
+  const hash = `#image-${this.currentIndex + 1}`;
+  if (window.location.hash !== hash) {
+    history.pushState(null, '', hash);
+  }
+}
 
   updated(changed) {
     super.updated(changed);
