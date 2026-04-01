@@ -20,7 +20,7 @@
     "module": "insta-app.js",
     "scripts": {
       "start": "web-dev-server",
-      "build": "rimraf public && rollup -c rollup.config.js && npm run analyze",
+      "build": "rimraf public && rollup -c rollup.config.js && npm run analyze && cp *.jpg *.png data.json public/",
       "analyze": "cem analyze --litelement --exclude public",
       "dddaudit": "hax audit",
       "release": "npm run build && commit-and-tag-version && git push --follow-tags origin main && npm publish",
