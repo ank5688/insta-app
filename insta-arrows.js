@@ -44,7 +44,7 @@ export class InstaArrows extends DDDSuper(I18NMixin(LitElement)) {
         display: block;
         position: absolute;
         top: 50%;
-        left: 0;
+        left: var(--ddd-spacing-0);
         width: 100%;
         transform: translateY(-50%);
         pointer-events: none;
@@ -59,7 +59,7 @@ export class InstaArrows extends DDDSuper(I18NMixin(LitElement)) {
         pointer-events: auto;
       }
       button {
-        background-color: rgba(255,255,255,0.8);
+        background-color: var(---ddd-theme-default-white);
         color: var(--ddd-theme-default-beaverBlue);
         border: 1px solid var(--ddd-theme-default-beaverBlue);
         border-radius: 50%;

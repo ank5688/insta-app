@@ -63,21 +63,21 @@ export class InstaIndicators extends DDDSuper(I18NMixin(LitElement)) {
     }
     .thumbs::-webkit-scrollbar-thumb {
       background: rgba(0,0,0,0.2);
-      border-radius: 2px;
+      border-radius: var(--ddd-radius-xs);
     }
     .thumb {
       width: 40px;
       height: 40px;
       object-fit: cover;
-      border-radius: 4px;
+      border-radius: var(--ddd-radius-xs);
       opacity: 0.45;
       cursor: pointer;
       transition: opacity 0.2s, outline 0.2s;
-      outline: 2px solid transparent;
+      outline: var(--ddd-border-sm) solid transparent;
     }
     .thumb.active {
       opacity: 1;
-      outline: 2px solid var(--ddd-theme-default-beaverBlue);
+      outline: var(--ddd-border-sm) solid var(--ddd-theme-default-beaverBlue);
     }
     .thumb:hover {
       opacity: 0.8;

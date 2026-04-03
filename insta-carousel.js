@@ -64,13 +64,13 @@ export class InstaApp extends DDDSuper(I18NMixin(LitElement)) {
         color: var(--playlist-project-text-color, #001f3f);
         background-color: #f8f9fa;
         font-family: var(--ddd-font-navigation);
-        box-shadow: 0 4px 8px rgba(0,0,0,0.30);
-        border: 2px solid #ccc;
-        border-radius: 12px;
+        box-shadow: var(--ddd-boxShadow-sm);
+        border: var(--ddd-border-sm);
+        border-radius: var(---ddd-border-md);
         height: 550px;
         width: 100%;
         max-width: 400px;
-        margin: 0;
+        margin: var(--ddd-spacing-0);
       }
       .wrapper {
         margin: var(--ddd-spacing-0);

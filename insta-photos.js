@@ -83,9 +83,9 @@ export class InstaPhotos extends DDDSuper(I18NMixin(LitElement)) {
       }
       h2 {
         font-size: var(--playlist-slide-heading-top-font-size, var(--ddd-font-size-lg));
-        margin: 0;
+        margin: var(--ddd-spacing-0);
         text-transform: uppercase;
-        font-weight: bold;
+        font-weight: var(--ddd-font-weight-bold);
         color: var(--playlist-slide-heading-color, var(--ddd-theme-default-beaverBlue));
         letter-spacing: 0.02em;
       }
@@ -106,8 +106,8 @@ export class InstaPhotos extends DDDSuper(I18NMixin(LitElement)) {
       }
       .body::-webkit-scrollbar-thumb {
         background-color: rgba(0,0,0,0.2);
-        border-radius: 6px;
-        border: 3px solid rgba(0,0,0,0.05);
+        border-radius: var(--ddd-radius-sm);
+        border: var(--ddd-border-md) solid transparent;
       }
       @media (prefers-color-scheme: dark) {
         :host {
