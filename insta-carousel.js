@@ -196,7 +196,7 @@ export class InstaApp extends DDDSuper(I18NMixin(LitElement)) {
     
       slide-indicator {
         margin-bottom: var(--ddd-spacing-1);
-        margin-bottom: var(--ddd-spacing-2); --- IGNORE ---
+        margin-bottom: var(--ddd-spacing-2);
       }
       @media (max-width: 600px) {
         :host {
