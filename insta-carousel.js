@@ -133,6 +133,26 @@ export class InstaApp extends DDDSuper(I18NMixin(LitElement)) {
       .heart-button:hover {
         opacity: 0.7;
       }
+      .share-button {
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 40px;
+        flex-shrink: 0;
+      }
+      .share-button img {
+        width: 30px;
+        height: 30px;
+        object-fit: contain;
+        object-position: center;
+      }
+      .share-button:hover {
+        opacity: 0.7;
+      }
       .image-description {
         margin: 0;
         font-size: var(--ddd-font-size-sm);
@@ -196,9 +216,9 @@ export class InstaApp extends DDDSuper(I18NMixin(LitElement)) {
     <span>${this.t.title}</span> ${this.title}
   </h3>
   <div class="content">
-    <button class="arrow-btn prev-btn" ?disabled="${this.currentIndex === 0}" @click=${this.prev}>&lt;</button>
+    <button class="arrow-btn prev-btn" ?disabled="${this.currentIndex === 0}" @click=${this.prev} aria-label="Previous image">&lt;</button>
     <slot></slot>
-    <button class="arrow-btn next-btn" ?disabled="${this.currentIndex === this.slides.length - 1}" @click=${this.next}>&gt;</button>
+    <button class="arrow-btn next-btn" ?disabled="${this.currentIndex === this.slides.length - 1}" @click=${this.next} aria-label="Next image">&gt;</button>
   </div>
   <div class="bottom-controls">
     <div class="indicators-container">
@@ -211,8 +231,11 @@ export class InstaApp extends DDDSuper(I18NMixin(LitElement)) {
     </div>
     ${html`
       <div class="description-with-heart">
-        <button class="heart-button" @click="${this._toggleCurrentLike}" title="Like this photo">
+        <button class="heart-button" @click="${this._toggleCurrentLike}" title="Like this photo" aria-label="${this.currentLiked ? 'Unlike this photo' : 'Like this photo'}">
           <img src="${this.currentLiked ? 'like-icon.png' : 'unlike-icon.png'}" alt="${this.currentLiked ? 'Unlike' : 'Like'}" />
+        </button>
+        <button class="share-button" @click="${this._shareCurrentImage}" title="Share this photo" aria-label="Share this photo">
+          <img src="share-icon.png" alt="Share" />
         </button>
         <p class="image-description">${this.currentDescription}</p>
       </div>
@@ -289,6 +312,16 @@ export class InstaApp extends DDDSuper(I18NMixin(LitElement)) {
     }
     // Trigger the like toggle event
     this._handleLikeToggle({ detail: { imageId: this.currentImageId, liked: this.currentLiked } });
+  }
+
+  _shareCurrentImage() {
+    const url = window.location.href;
+    navigator.clipboard.writeText(url).then(() => {
+      // Optionally, show a toast or alert that the link was copied
+      alert('Link copied to clipboard!');
+    }).catch(err => {
+      console.error('Failed to copy: ', err);
+    });
   }
 
   _updateSlides() {

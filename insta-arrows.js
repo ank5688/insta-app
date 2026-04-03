@@ -94,12 +94,14 @@ export class InstaArrows extends DDDSuper(I18NMixin(LitElement)) {
     <div class="wrapper">
       <button class="prev"
         ?disabled="${this.index === 0}"
-        @click=${() => this.dispatchEvent(new CustomEvent('prev-clicked', {bubbles: true, composed: true}))}>
+        @click=${() => this.dispatchEvent(new CustomEvent('prev-clicked', {bubbles: true, composed: true}))}
+        aria-label="Previous image">
         &lt;
       </button>
       <button class="next"
         ?disabled="${this.index === this.total - 1}"
-        @click=${() => this.dispatchEvent(new CustomEvent('next-clicked', {bubbles: true, composed: true}))}>
+        @click=${() => this.dispatchEvent(new CustomEvent('next-clicked', {bubbles: true, composed: true}))}
+        aria-label="Next image">
        &gt;
       </button>
     </div>
