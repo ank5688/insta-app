@@ -67,10 +67,12 @@ export class InstaApp extends DDDSuper(I18NMixin(LitElement)) {
         box-shadow: var(--ddd-boxShadow-sm);
         border: var(--ddd-border-sm);
         border-radius: var(---ddd-border-md);
-        height: 550px;
         width: 100%;
         max-width: 400px;
+        height: 550px;
         margin: var(--ddd-spacing-0);
+        box-sizing: border-box;
+        overflow: hidden;
       }
       .wrapper {
         margin: var(--ddd-spacing-0);
@@ -78,8 +80,9 @@ export class InstaApp extends DDDSuper(I18NMixin(LitElement)) {
         position: relative;
         display: flex;
         flex-direction: column;
-        height: 550px;
+        height: 100%;
         min-height: 0;
+        box-sizing: border-box;
       }
       h span {
         font-size: var(--playlist-project-label-font-size-xxlg, var(--ddd-font-size-xxlg));
@@ -91,14 +94,17 @@ export class InstaApp extends DDDSuper(I18NMixin(LitElement)) {
         display: flex;
         align-items: center;
         justify-content: center;
+        overflow: hidden;
       }
       .bottom-controls {
         display: flex;
         flex-direction: column;
         align-items: center;
-        padding: 0 var(--ddd-spacing-2);
-        margin-top: var(--ddd-spacing-2);
-        margin-bottom: var(--ddd-spacing-8);
+        padding: 0 var(--ddd-spacing-1);
+        margin-top: var(--ddd-spacing-1);
+        margin-bottom: var(--ddd-spacing-1);
+        box-sizing: border-box;
+        overflow-y: auto;
       }
       .indicators-container {
         margin-bottom: var(--ddd-spacing-1);
@@ -201,8 +207,10 @@ export class InstaApp extends DDDSuper(I18NMixin(LitElement)) {
       @media (max-width: 600px) {
         :host {
           height: 450px;
-          max-width: 100%;
-          margin: var(--ddd-spacing-2);
+          margin: var(--ddd-spacing-1);
+        }
+        .bottom-controls {
+          margin-bottom: var(--ddd-spacing-1);
         }
       }
     `];

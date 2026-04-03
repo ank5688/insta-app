@@ -12,17 +12,19 @@
       margin: var(--ddd-spacing-0);
       padding: var(--ddd-spacing-0);
       width: 100%;
-      max-width: none;
     }
     #demo {
       margin: var(--ddd-spacing-2);
     }
-    insta-app {
-      margin: var(--ddd-spacing-2);
-      width: 100px;
+   insta-app {
+      display: block;
+      margin: var(--ddd-spacing-2) auto;
+      width: 400px;        /* fixed width instead of 100% */
+      max-width: 90vw;     /* shrinks proportionally, never overflows */
+      min-width: 0;        /* remove the 250px floor */
       border: var(--ddd-border-md);
       border-radius: var(--ddd-radius-lg);
-    }
+}
     insta-app:hover {
       box-shadow: var(--ddd-boxShadow-sm);
     }
